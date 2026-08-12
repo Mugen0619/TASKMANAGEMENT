@@ -11,19 +11,23 @@
   id: "1699999999999",                    // タスクを区別するための一意なID（作成時に自動採番）
   title: "要件定義書を書く",               // タスクのタイトル（1〜100文字）
   status: "todo",                          // 状態: "todo"(未着手) / "doing"(作業中) / "done"(完了)
+  priority: "medium",                      // 優先度: "high"(高) / "medium"(中) / "low"(低)。初期値は"medium"
+  dueDate: "2026-08-20",                   // 期限日（YYYY-MM-DD形式の文字列）。未設定の場合はnull
   createdAt: "2026-08-12T10:00:00.000Z"    // 作成日時（同一列内の並び順に使う）
 }
 ```
 
-例え：タスク1件を「付箋1枚」だとすると、`id`は付箋の裏に貼る管理シール、`title`は付箋の本文、`status`はその付箋が今どの列に貼られているか、`createdAt`はいつ書いたかのメモ、というイメージ。
+例え：タスク1件を「付箋1枚」だとすると、`id`は付箋の裏に貼る管理シール、`title`は付箋の本文、`status`はその付箋が今どの列に貼られているか、`priority`は付箋の色（重要度を表すマーカー）、`dueDate`は付箋の隅に書く締切メモ（書かないことも可）、`createdAt`はいつ書いたかのメモ、というイメージ。
+
+`priority`（プライオリティ。優先度の意味）は3段階の文字列で持ち、画面表示のときに色へ変換する（例：high→赤、medium→黄、low→緑）。`dueDate`（デュー・デート。期限日の意味）は日付の文字列で持ち、未設定のタスクは`null`（何もない、という値）にしておく。
 
 タスク一覧は、このタスクオブジェクトを配列（リスト）にまとめて持つイメージ。
 
 ```js
 [
-  { id: "...", title: "タスクA", status: "todo",  createdAt: "..." },
-  { id: "...", title: "タスクB", status: "doing", createdAt: "..." },
-  { id: "...", title: "タスクC", status: "done",  createdAt: "..." },
+  { id: "...", title: "タスクA", status: "todo",  priority: "high",   dueDate: "2026-08-20", createdAt: "..." },
+  { id: "...", title: "タスクB", status: "doing", priority: "medium", dueDate: null,          createdAt: "..." },
+  { id: "...", title: "タスクC", status: "done",  priority: "low",    dueDate: "2026-08-10", createdAt: "..." },
 ]
 ```
 

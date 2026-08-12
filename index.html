@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>タスク管理ボード</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>📋 タスク管理ボード</h1>
+    <button id="newTaskBtn" class="btn btn-primary">＋ 新規タスク</button>
+  </header>
+
+  <main class="board">
+    <section class="column" data-status="todo">
+      <div class="column-header">
+        <span class="column-name">未着手</span>
+        <span class="column-count" id="count-todo">0</span>
+      </div>
+      <div class="card-list" id="list-todo"></div>
+      <button class="btn btn-add-task" data-status="todo">＋ タスクを追加</button>
+    </section>
+
+    <section class="column" data-status="doing">
+      <div class="column-header">
+        <span class="column-name">作業中</span>
+        <span class="column-count" id="count-doing">0</span>
+      </div>
+      <div class="card-list" id="list-doing"></div>
+      <button class="btn btn-add-task" data-status="doing">＋ タスクを追加</button>
+    </section>
+
+    <section class="column" data-status="done">
+      <div class="column-header">
+        <span class="column-name">完了</span>
+        <span class="column-count" id="count-done">0</span>
+      </div>
+      <div class="card-list" id="list-done"></div>
+      <button class="btn btn-add-task" data-status="done">＋ タスクを追加</button>
+    </section>
+  </main>
+
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h2 id="modalTitle">新規タスク</h2>
+      <form id="taskForm">
+        <div class="form-field">
+          <label for="titleInput">タイトル</label>
+          <input type="text" id="titleInput" maxlength="100" placeholder="タスクのタイトルを入力">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="priorityInput">優先度</label>
+            <select id="priorityInput">
+              <option value="high">高</option>
+              <option value="medium" selected>中</option>
+              <option value="low">低</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="dueDateInput">期限日</label>
+            <input type="date" id="dueDateInput">
+          </div>
+        </div>
+        <div class="form-field" id="statusField">
+          <label for="statusInput">状態</label>
+          <select id="statusInput">
+            <option value="todo">未着手</option>
+            <option value="doing">作業中</option>
+            <option value="done">完了</option>
+          </select>
+        </div>
+        <p id="formError" class="form-error hidden"></p>
+        <div class="modal-actions">
+          <button type="submit" id="submitBtn" class="btn btn-primary">追加</button>
+          <button type="button" id="cancelBtn" class="btn">キャンセル</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
