@@ -1,0 +1,28 @@
+name: タスク
+description: 機能追加・修正・改善などの作業用Issue
+title: "[タスク] "
+labels: []
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: 背景・目的
+      description: なぜこの作業が必要か、何を達成したいかを書く
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: やること
+      description: 作業内容をチェックリストで書く
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 完了条件
+      description: 何が確認できたら完了とみなすか
+    validations:
+      required: true
