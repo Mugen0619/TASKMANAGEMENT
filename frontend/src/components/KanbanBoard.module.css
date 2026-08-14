@@ -1,0 +1,11 @@
+.board {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.message {
+  color: #555;
+  text-align: center;
+  margin-top: 2rem;
+}
