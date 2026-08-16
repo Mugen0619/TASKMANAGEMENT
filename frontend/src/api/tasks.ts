@@ -60,3 +60,16 @@ export async function updateTaskStatus(id: number, status: TaskStatus): Promise<
   }
   return response.json();
 }
+
+// taskIdsは、同一状態（列）内での新しい表示順（先頭から順）
+export async function reorderTasks(status: TaskStatus, taskIds: number[]): Promise<Task[]> {
+  const response = await fetch(`${API_BASE_URL}/tasks/reorder`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status, taskIds }),
+  });
+  if (!response.ok) {
+    throw new Error(`並べ替えに失敗しました: ${response.status}`);
+  }
+  return response.json();
+}
