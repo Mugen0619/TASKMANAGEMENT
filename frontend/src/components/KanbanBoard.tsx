@@ -1,25 +1,24 @@
 import type { Task, TaskStatus } from "../types/task";
+import { STATUS_OPTIONS } from "../constants/taskOptions";
 import { TaskColumn } from "./TaskColumn";
 import styles from "./KanbanBoard.module.css";
 
-const COLUMNS: { status: TaskStatus; title: string }[] = [
-  { status: "TODO", title: "未着手" },
-  { status: "DOING", title: "作業中" },
-  { status: "DONE", title: "完了" },
-];
-
 interface KanbanBoardProps {
   tasks: Task[];
+  onStatusChange: (id: number, status: TaskStatus) => void;
+  onEdit: (task: Task) => void;
 }
 
-export function KanbanBoard({ tasks }: KanbanBoardProps) {
+export function KanbanBoard({ tasks, onStatusChange, onEdit }: KanbanBoardProps) {
   return (
     <div className={styles.board}>
-      {COLUMNS.map(({ status, title }) => (
+      {STATUS_OPTIONS.map(({ value, label }) => (
         <TaskColumn
-          key={status}
-          title={title}
-          tasks={tasks.filter((task) => task.status === status)}
+          key={value}
+          title={label}
+          tasks={tasks.filter((task) => task.status === value)}
+          onStatusChange={onStatusChange}
+          onEdit={onEdit}
         />
       ))}
     </div>

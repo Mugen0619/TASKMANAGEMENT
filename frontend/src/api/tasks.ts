@@ -29,3 +29,34 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
   }
   return response.json();
 }
+
+// PUT /api/tasks/{id} はタイトル・優先度・期限日のみを更新し、状態は変更しない
+export interface UpdateTaskInput {
+  title: string;
+  priority: TaskPriority;
+  dueDate: string | null;
+}
+
+export async function updateTask(id: number, input: UpdateTaskInput): Promise<Task> {
+  const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    throw new Error(`タスクの更新に失敗しました: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function updateTaskStatus(id: number, status: TaskStatus): Promise<Task> {
+  const response = await fetch(`${API_BASE_URL}/tasks/${id}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) {
+    throw new Error(`状態の更新に失敗しました: ${response.status}`);
+  }
+  return response.json();
+}
