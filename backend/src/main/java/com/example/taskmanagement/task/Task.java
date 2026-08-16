@@ -41,6 +41,9 @@ public class Task {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    /** 同一状態（列）内での表示順。値が小さいほど先頭に表示する。 */
+    private Integer sortOrder;
+
     protected Task() {
         // JPAが利用する引数なしコンストラクタ
     }
@@ -95,5 +98,13 @@ public class Task {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }
