@@ -1,16 +1,11 @@
-import type { Task } from "../types/task";
+import type { Task, TaskStatus } from "../types/task";
+import { STATUS_OPTIONS } from "../constants/taskOptions";
 import styles from "./TaskCard.module.css";
 
 const PRIORITY_LABEL: Record<Task["priority"], string> = {
   HIGH: "🔴 高",
   MEDIUM: "🟡 中",
   LOW: "🟢 低",
-};
-
-const STATUS_LABEL: Record<Task["status"], string> = {
-  TODO: "未着手",
-  DOING: "作業中",
-  DONE: "完了",
 };
 
 function isOverdue(task: Task): boolean {
@@ -24,9 +19,11 @@ function isOverdue(task: Task): boolean {
 
 interface TaskCardProps {
   task: Task;
+  onStatusChange: (id: number, status: TaskStatus) => void;
+  onEdit: (task: Task) => void;
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, onStatusChange, onEdit }: TaskCardProps) {
   const overdue = isOverdue(task);
 
   return (
@@ -37,7 +34,24 @@ export function TaskCard({ task }: TaskCardProps) {
       <p className={overdue ? styles.dueDateOverdue : styles.dueDate}>
         期限: {task.dueDate ?? "未設定"}
       </p>
-      <p className={styles.status}>状態: {STATUS_LABEL[task.status]}</p>
+      <div className={styles.controls}>
+        <label className={styles.statusControl}>
+          状態:
+          <select
+            value={task.status}
+            onChange={(event) => onStatusChange(task.id, event.target.value as TaskStatus)}
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="button" className={styles.editButton} onClick={() => onEdit(task)}>
+          ✎ 編集
+        </button>
+      </div>
     </div>
   );
 }
