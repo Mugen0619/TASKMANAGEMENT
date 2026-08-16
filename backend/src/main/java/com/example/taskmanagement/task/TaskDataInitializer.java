@@ -1,14 +1,17 @@
 package com.example.taskmanagement.task;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 /**
  * 起動時にサンプルタスクを投入する。動作確認用（H2はインメモリなので再起動のたびに再投入される）。
+ * TaskSortOrderInitializerより先に実行し、投入したタスクにも並び順が振られるようにする。
  */
 @Component
+@Order(1)
 public class TaskDataInitializer implements CommandLineRunner {
 
     private final TaskRepository taskRepository;
