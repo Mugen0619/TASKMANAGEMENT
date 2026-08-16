@@ -28,3 +28,7 @@
 - バックエンド(Spring Boot)は必ず **8080番ポート** で起動する。`backend/src/main/resources/application.properties` に `server.port=8080` を明記している。
 - フロントエンド(Vite)は必ず **5173番ポート** で起動する。`frontend/vite.config.ts` に `server: { port: 5173, strictPort: true }` を設定しており、ポートが使用中の場合は別ポートへ自動切り替えせずエラーで停止する。
 - ポート競合でサーバーが起動できない場合、**別のポートに逃げてはいけない**。使用中プロセスを確認・停止してから指定ポートで起動し直すこと。具体的な手順はSkill `dev-server-port-conflict`(`.claude/skills/dev-server-port-conflict/SKILL.md`)を参照する。
+
+## 7. 実装前のスコープ確認
+- 新しい機能を実装する前に、必ず `docs/requirements.md` の「6. 対象外」セクションを確認する。
+- これから実装しようとする機能がそのセクションに含まれている場合は、実装を進める前に中断し、ユーザーに確認する。
