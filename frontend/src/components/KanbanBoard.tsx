@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { fetchTasks } from "../api/tasks";
 import type { Task, TaskStatus } from "../types/task";
 import { TaskColumn } from "./TaskColumn";
 import styles from "./KanbanBoard.module.css";
@@ -10,28 +8,11 @@ const COLUMNS: { status: TaskStatus; title: string }[] = [
   { status: "DONE", title: "完了" },
 ];
 
-export function KanbanBoard() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface KanbanBoardProps {
+  tasks: Task[];
+}
 
-  useEffect(() => {
-    fetchTasks()
-      .then(setTasks)
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "不明なエラーが発生しました");
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  if (isLoading) {
-    return <p className={styles.message}>読み込み中...</p>;
-  }
-
-  if (error) {
-    return <p className={styles.message}>エラー: {error}</p>;
-  }
-
+export function KanbanBoard({ tasks }: KanbanBoardProps) {
   return (
     <div className={styles.board}>
       {COLUMNS.map(({ status, title }) => (
