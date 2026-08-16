@@ -1,9 +1,20 @@
 import { useEffect, useState } from "react";
-import { createTask, fetchTasks, updateTask, updateTaskStatus } from "./api/tasks";
+import { createTask, fetchTasks, reorderTasks, updateTask, updateTaskStatus } from "./api/tasks";
 import type { Task, TaskStatus } from "./types/task";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { TaskFormModal, type TaskFormValues } from "./components/TaskFormModal";
 import "./App.css";
+
+// 指定した状態（列）内のタスクだけを、orderedIdsの順に並べ替える（それ以外の相対順は維持する）
+function reorderWithinStatus(tasks: Task[], status: TaskStatus, orderedIds: number[]): Task[] {
+  const orderIndex = new Map(orderedIds.map((id, index) => [id, index]));
+  return [...tasks].sort((a, b) => {
+    if (a.status === status && b.status === status) {
+      return (orderIndex.get(a.id) ?? 0) - (orderIndex.get(b.id) ?? 0);
+    }
+    return 0;
+  });
+}
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -49,6 +60,18 @@ function App() {
     }
   }
 
+  async function handleReorder(status: TaskStatus, taskIds: number[]) {
+    const previousTasks = tasks;
+    setTasks((prev) => reorderWithinStatus(prev, status, taskIds));
+    try {
+      const reordered = await reorderTasks(status, taskIds);
+      setTasks((prev) => prev.map((task) => reordered.find((r) => r.id === task.id) ?? task));
+    } catch (err) {
+      setTasks(previousTasks);
+      alert(err instanceof Error ? err.message : "並べ替えに失敗しました");
+    }
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -61,7 +84,12 @@ function App() {
         {isLoading && <p className="message">読み込み中...</p>}
         {!isLoading && error && <p className="message">エラー: {error}</p>}
         {!isLoading && !error && (
-          <KanbanBoard tasks={tasks} onStatusChange={handleStatusChange} onEdit={setEditingTask} />
+          <KanbanBoard
+            tasks={tasks}
+            onStatusChange={handleStatusChange}
+            onEdit={setEditingTask}
+            onReorder={handleReorder}
+          />
         )}
       </main>
       {isCreateOpen && (

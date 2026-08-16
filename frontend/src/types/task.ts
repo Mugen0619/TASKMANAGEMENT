@@ -10,4 +10,5 @@ export interface Task {
   priority: TaskPriority;
   dueDate: string | null; // "YYYY-MM-DD" 形式、未設定はnull
   createdAt: string; // ISO 8601形式の日時文字列
+  sortOrder: number; // 同一状態（列）内での表示順。値が小さいほど先頭
 }

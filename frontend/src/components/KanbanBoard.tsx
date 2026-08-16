@@ -7,18 +7,21 @@ interface KanbanBoardProps {
   tasks: Task[];
   onStatusChange: (id: number, status: TaskStatus) => void;
   onEdit: (task: Task) => void;
+  onReorder: (status: TaskStatus, taskIds: number[]) => void;
 }
 
-export function KanbanBoard({ tasks, onStatusChange, onEdit }: KanbanBoardProps) {
+export function KanbanBoard({ tasks, onStatusChange, onEdit, onReorder }: KanbanBoardProps) {
   return (
     <div className={styles.board}>
       {STATUS_OPTIONS.map(({ value, label }) => (
         <TaskColumn
           key={value}
+          status={value}
           title={label}
           tasks={tasks.filter((task) => task.status === value)}
           onStatusChange={onStatusChange}
           onEdit={onEdit}
+          onReorder={onReorder}
         />
       ))}
     </div>

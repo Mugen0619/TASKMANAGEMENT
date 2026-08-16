@@ -15,4 +15,14 @@
 .cardList {
   display: flex;
   flex-direction: column;
+  min-height: 1rem;
+}
+
+.draggableCard {
+  cursor: grab;
+}
+
+.dragging {
+  cursor: grabbing;
+  opacity: 0.5;
 }
