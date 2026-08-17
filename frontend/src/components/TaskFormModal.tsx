@@ -15,15 +15,18 @@ interface TaskFormModalProps {
   initialValues?: TaskFormValues;
   onCancel: () => void;
   onSubmit: (values: TaskFormValues) => Promise<void>;
+  onDelete?: () => Promise<void>;
 }
 
-export function TaskFormModal({ mode, initialValues, onCancel, onSubmit }: TaskFormModalProps) {
+export function TaskFormModal({ mode, initialValues, onCancel, onSubmit, onDelete }: TaskFormModalProps) {
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [priority, setPriority] = useState<TaskPriority>(initialValues?.priority ?? "MEDIUM");
   const [dueDate, setDueDate] = useState(initialValues?.dueDate ?? "");
   const [status, setStatus] = useState<TaskStatus>(initialValues?.status ?? "TODO");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
   const heading = mode === "create" ? "タスクを作成" : "タスクを編集";
   const submitLabel = mode === "create" ? "登録" : "保存";
@@ -54,6 +57,29 @@ export function TaskFormModal({ mode, initialValues, onCancel, onSubmit }: TaskF
             : "タスクの更新に失敗しました",
       );
       setIsSubmitting(false);
+    }
+  }
+
+  function handleDeleteClick() {
+    setIsConfirmingDelete(true);
+  }
+
+  function handleCancelDelete() {
+    setIsConfirmingDelete(false);
+  }
+
+  async function handleConfirmDelete() {
+    if (!onDelete) {
+      return;
+    }
+    setError(null);
+    setIsDeleting(true);
+    try {
+      await onDelete();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "タスクの削除に失敗しました");
+      setIsDeleting(false);
+      setIsConfirmingDelete(false);
     }
   }
 
@@ -119,14 +145,43 @@ export function TaskFormModal({ mode, initialValues, onCancel, onSubmit }: TaskF
             </label>
           )}
           {error && <p className={styles.error}>{error}</p>}
-          <div className={styles.actions}>
-            <button type="button" onClick={onCancel} disabled={isSubmitting}>
-              キャンセル
-            </button>
-            <button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "処理中..." : submitLabel}
-            </button>
-          </div>
+          {isConfirmingDelete ? (
+            <div>
+              <p className={styles.confirmMessage}>本当に削除しますか？</p>
+              <div className={styles.actions}>
+                <button type="button" onClick={handleCancelDelete} disabled={isDeleting}>
+                  キャンセル
+                </button>
+                <button
+                  type="button"
+                  className={styles.confirmDeleteButton}
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "削除中..." : "削除する"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.actions}>
+              {mode === "edit" && onDelete && (
+                <button
+                  type="button"
+                  className={styles.deleteButton}
+                  onClick={handleDeleteClick}
+                  disabled={isSubmitting}
+                >
+                  削除
+                </button>
+              )}
+              <button type="button" onClick={onCancel} disabled={isSubmitting}>
+                キャンセル
+              </button>
+              <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "処理中..." : submitLabel}
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>

@@ -61,6 +61,15 @@ export async function updateTaskStatus(id: number, status: TaskStatus): Promise<
   return response.json();
 }
 
+export async function deleteTask(id: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error(`タスクの削除に失敗しました: ${response.status}`);
+  }
+}
+
 // taskIdsは、同一状態（列）内での新しい表示順（先頭から順）
 export async function reorderTasks(status: TaskStatus, taskIds: number[]): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/tasks/reorder`, {
