@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createTask, fetchTasks, reorderTasks, updateTask, updateTaskStatus } from "./api/tasks";
+import { createTask, deleteTask, fetchTasks, reorderTasks, updateTask, updateTaskStatus } from "./api/tasks";
 import type { Task, TaskStatus } from "./types/task";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { TaskFormModal, type TaskFormValues } from "./components/TaskFormModal";
@@ -48,6 +48,15 @@ function App() {
       dueDate: values.dueDate,
     });
     setTasks((prev) => prev.map((task) => (task.id === updated.id ? updated : task)));
+    setEditingTask(null);
+  }
+
+  async function handleDeleteTask() {
+    if (!editingTask) {
+      return;
+    }
+    await deleteTask(editingTask.id);
+    setTasks((prev) => prev.filter((task) => task.id !== editingTask.id));
     setEditingTask(null);
   }
 
@@ -106,6 +115,7 @@ function App() {
           }}
           onCancel={() => setEditingTask(null)}
           onSubmit={handleUpdateTask}
+          onDelete={handleDeleteTask}
         />
       )}
     </div>
