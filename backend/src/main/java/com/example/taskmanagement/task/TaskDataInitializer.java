@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 /**
- * 起動時にサンプルタスクを投入する。動作確認用（H2はインメモリなので再起動のたびに再投入される）。
+ * 起動時にサンプルタスクを投入する。動作確認用（テーブルが空の場合のみ投入する）。
  * TaskSortOrderInitializerより先に実行し、投入したタスクにも並び順が振られるようにする。
  */
 @Component
