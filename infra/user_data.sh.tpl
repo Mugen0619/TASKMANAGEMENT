@@ -16,6 +16,13 @@ curl -SL https://github.com/docker/compose/releases/latest/download/docker-compo
   -o /usr/local/lib/docker/cli-plugins/docker-compose
 chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 
+# Amazon Linux 2023のdnfリポジトリが入れるdocker-buildx-pluginは古く(0.12系)、
+# `docker compose build` が要求する0.17以上を満たさないため、最新版で上書きする。
+buildx_url=$(curl -sSL https://api.github.com/repos/docker/buildx/releases/latest \
+  | grep browser_download_url | grep linux-amd64\" | cut -d '"' -f 4)
+curl -SL "$buildx_url" -o /usr/libexec/docker/cli-plugins/docker-buildx
+chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
+
 # t3.microはメモリが1GBしかなく、Spring Boot + PostgreSQL + フロントエンドの
 # Dockerビルドでメモリ不足になりやすいため、スワップ領域を追加しておく。
 fallocate -l 1G /swapfile
