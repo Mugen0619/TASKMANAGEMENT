@@ -1,0 +1,30 @@
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfvars
+!infra/terraform.tfvars.example
+infra/crash.log
+infra/generated/
+infra/tfplan
+infra/*.tfplan
+
+# SSH keys
+*.pem
+*.ppk
+
+# Node
+node_modules/
+dist/
+
+# Java / Gradle
+backend/build/
+backend/bin/
+backend/.gradle/
+backend/bootrun.log
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

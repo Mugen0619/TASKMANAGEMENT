@@ -1,0 +1,10 @@
+# このファイルをコピーして terraform.tfvars を作り、実際の値を入れて使う。
+# terraform.tfvars は .gitignore で除外されているのでコミットされない。
+#
+#   cp terraform.tfvars.example terraform.tfvars
+
+# SSH接続を許可する自分のグローバルIP。https://checkip.amazonaws.com で確認できる
+my_ip_cidr = "203.0.113.10/32"
+
+# AWS Budgetsのアラート通知を受け取るメールアドレス
+budget_alert_email = "you@example.com"
