@@ -73,29 +73,35 @@ npm run dev
 
 ### アーキテクチャ概要
 
-EC2インスタンス1台の中に、Docker Composeで3つのコンテナ（PostgreSQL・Spring Boot・nginx）を同居させるシンプルな構成。
+EC2インスタンス1台の中でfrontend/backendの2コンテナをDocker Composeで動かし、DB（PostgreSQL）だけはAWSのマネージドDBサービスRDSに切り出している。
 
 ```
-[ブラウザ] --HTTP(80)--> [EC2インスタンス (t3.micro)]
+[ブラウザ] --HTTP(80)--> [EC2インスタンス (t3.micro, パブリックサブネット)]
                             └─ Docker Compose
                                ├─ frontend (nginx) :80 ── 静的ファイル配信 + /api を backend へリバースプロキシ
-                               ├─ backend (Spring Boot) :8080 ── frontendコンテナからのみアクセス可能
-                               └─ postgres :5432 ── backendコンテナからのみアクセス可能
+                               └─ backend (Spring Boot) :8080 ── frontendコンテナからのみアクセス可能
+                                     │
+                                     │ 5432 (RDSのSGでEC2のSGからのみ許可)
+                                     ▼
+                          [RDS PostgreSQL (db.t4g.micro, プライベートサブネット×2AZ)]
+                          publicly_accessible = false（自分のPC等、外部からは接続不可）
 ```
 
 - リージョン: 東京（ap-northeast-1）
-- ネットワーク: 専用VPC（10.0.0.0/16）+ パブリックサブネット1つ + Internet Gateway
-- セキュリティグループ: SSH(22)は自分のIPのみ、HTTP(80)は全体に許可。DB(5432)は外部に一切公開せずDocker内部ネットワークのみで完結
+- ネットワーク: 専用VPC（10.0.0.0/16）。EC2用のパブリックサブネット1つ + RDS用のプライベートサブネット2つ（異なるAZ、RDSのDBサブネットグループの要件のため）+ Internet Gateway
+- セキュリティグループ: EC2はSSH(22)を自分のIPのみ・HTTP(80)を全体に許可。RDSは5432番ポートをEC2のセキュリティグループからのみ許可（自分のPCなど他からは一切接続不可）
+- RDSはMulti-AZ構成にはせず、無料利用枠を優先したシングル構成
 - 独自ドメイン・HTTPS化・CI/CD自動化・高可用性構成は今回のスコープ外（AWSが発行するパブリックIPで公開）
 
 ### 使用しているTerraformリソース（`infra/`）
 
 | ファイル | 内容 |
 |---|---|
-| `network.tf` | VPC・サブネット・Internet Gateway・ルートテーブル |
-| `security_group.tf` | ファイアウォール（SSHは自分のIPのみ、HTTPは全体） |
+| `network.tf` | VPC・パブリック/プライベートサブネット・Internet Gateway・ルートテーブル |
+| `security_group.tf` | EC2用ファイアウォール（SSHは自分のIPのみ、HTTPは全体） |
+| `rds.tf` | RDS(PostgreSQL)本体、DBサブネットグループ、RDS用セキュリティグループ（EC2のSGからのみ許可）、マスターパスワードの自動生成 |
 | `key_pair.tf` | SSH接続用の鍵ペアを新規生成（秘密鍵はローカルの`infra/generated/`に保存、Git管理外） |
-| `ec2.tf` | EC2インスタンス本体。起動時にuser_data（`user_data.sh.tpl`）でDocker環境構築・アプリのclone・起動までを自動実行 |
+| `ec2.tf` | EC2インスタンス本体。起動時にuser_data（`user_data.sh.tpl`）でDocker環境構築・アプリのclone・起動までを自動実行（RDSのエンドポイントを`.env`に埋め込む） |
 | `budget.tf` | AWS Budgets。月額コストが50%/100%を超える（超えそうになる）とメール通知 |
 
 ### デプロイ手順
@@ -117,8 +123,9 @@ EC2の起動時（user_data）にDockerのインストール・リポジトリ�
 
 ### コスト面の注意
 
-- EC2（t3.micro、750時間/月）・EBS（8GB）は無料利用枠の範囲内
-- 2024年2月のAWS料金改定により、**パブリックIPv4アドレスはEC2起動中は無料利用枠の対象外で $0.005/時間 課金される**（Elastic IPも同様）。使わない時はEC2を停止すると、その間の課金は発生しない
+- EC2（t3.micro、750時間/月）・EBS（8GB）・RDS（db.t4g.micro、750時間/月、ストレージ20GB）は、いずれも無料利用枠の対象であれば範囲内。**ただしアカウントによっては無料利用枠の対象外の場合があるため、AWS請求コンソールの「Free Tier」ページで事前に確認することを推奨**
+- 2024年2月のAWS料金改定により、**パブリックIPv4アドレスはEC2起動中は無料利用枠の対象外で $0.005/時間 課金される**（Elastic IPも同様）。RDSは`publicly_accessible = false`のためこの課金対象外
+- 使わない時はEC2・RDSともに停止できる（`aws ec2 stop-instances` / `aws rds stop-db-instance`）。ただし**RDSは停止しても7日後にAWSが自動的に再起動する仕様**のため、長期間停止したい場合は定期的に再度停止するか、`terraform destroy`で削除する
 - `terraform destroy` でインフラ一式を削除できる（学習が終わったら忘れずに削除する）
 
 ### 再デプロイ（コード変更後）
