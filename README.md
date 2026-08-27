@@ -26,7 +26,7 @@ TASKMANAGEMENT/
 ├── docs/                    # 要件定義・設計ドキュメント
 ├── infra/                   # AWSインフラのTerraformコード（IaC）
 ├── docker-compose.yml       # ローカル開発用（PostgreSQLのみ）
-└── docker-compose.prod.yml  # 本番用（EC2上でpostgres/backend/frontendをまとめて起動）
+└── docker-compose.prod.yml  # 本番用（EC2上でbackend/frontendをまとめて起動。DBはRDSを利用するためpostgresは含まない）
 ```
 
 ## ドキュメント
