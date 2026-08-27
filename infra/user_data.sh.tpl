@@ -36,9 +36,9 @@ git clone --branch '${git_ref}' --depth 1 '${repo_url}' /opt/app
 cd /opt/app
 
 cat > .env <<EOF
-POSTGRES_DB=${db_name}
-POSTGRES_USER=${db_username}
-POSTGRES_PASSWORD=${db_password}
+DB_URL=jdbc:postgresql://${db_host}:5432/${db_name}
+DB_USERNAME=${db_username}
+DB_PASSWORD=${db_password}
 EOF
 chmod 600 .env
 

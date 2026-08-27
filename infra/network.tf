@@ -49,3 +49,28 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
+
+# RDS用のプライベートサブネット。
+# RDSのDBサブネットグループは（シングルAZ構成でも）異なる2つのAZのサブネットが必須のため、
+# EC2のパブリックサブネットとは別に、インターネットゲートウェイへのルートを持たない
+# プライベートサブネットを2つのAZに用意する（ルートテーブルを関連付けないため、
+# VPCのメインルートテーブル＝VPC内のみの通信になる）。
+resource "aws_subnet" "private_a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "${var.aws_region}a"
+
+  tags = {
+    Name = "${var.project_name}-private-subnet-a"
+  }
+}
+
+resource "aws_subnet" "private_c" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "${var.aws_region}c"
+
+  tags = {
+    Name = "${var.project_name}-private-subnet-c"
+  }
+}

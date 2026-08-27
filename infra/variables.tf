@@ -40,9 +40,9 @@ variable "app_repo_url" {
 }
 
 variable "app_git_ref" {
-  description = "EC2上でcloneするブランチ名。PRマージ後は master に変更して再適用（再作成）することを想定"
+  description = "EC2上でcloneするブランチ名"
   type        = string
-  default     = "feature/31-deploy-aws-ec2-docker-compose"
+  default     = "master"
 }
 
 variable "budget_alert_email" {
