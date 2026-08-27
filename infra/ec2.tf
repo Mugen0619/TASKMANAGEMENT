@@ -4,12 +4,6 @@ data "aws_ssm_parameter" "al2023_ami" {
   name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
 
-# DBパスワードを自動生成する（人が入力・管理する必要をなくす）
-resource "random_password" "db_password" {
-  length  = 24
-  special = false
-}
-
 resource "aws_instance" "app" {
   ami                         = data.aws_ssm_parameter.al2023_ami.value
   instance_type               = var.instance_type
@@ -26,9 +20,10 @@ resource "aws_instance" "app" {
   user_data = templatefile("${path.module}/user_data.sh.tpl", {
     repo_url    = var.app_repo_url
     git_ref     = var.app_git_ref
+    db_host     = aws_db_instance.postgres.address
     db_name     = var.db_name
     db_username = var.db_username
-    db_password = random_password.db_password.result
+    db_password = random_password.rds_password.result
   })
 
   tags = {

@@ -1,31 +1,13 @@
 services:
-  postgres:
-    image: postgres:16
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-taskmanagement}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   backend:
     build:
       context: ./backend
     restart: unless-stopped
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-taskmanagement}
-      DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
       JAVA_OPTS: -Xmx384m
-    depends_on:
-      postgres:
-        condition: service_healthy
 
   frontend:
     build:
@@ -37,6 +19,3 @@ services:
       - "80:80"
     depends_on:
       - backend
-
-volumes:
-  pgdata:
