@@ -19,3 +19,14 @@ services:
       - "80:80"
     depends_on:
       - backend
+    networks:
+      # backendとの通信用(明示していないサービスが自動参加する既定のネットワーク)
+      - default
+      # INQUIRY-MANAGEMENT(別リポジトリ・別docker-composeスタック)との通信用。
+      # EC2上で事前に`docker network create shared_net`しておく必要がある
+      - shared_net
+
+networks:
+  default: {}
+  shared_net:
+    external: true
